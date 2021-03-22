@@ -229,13 +229,13 @@
                 <section class="question-list lh-bj-list pr">
                   <ul class="pr10">
                     <li v-for="(comment,index) in data.items" v-bind:key="index">
-                        <aside class="noter-pic">
+                        <aside class="noter-pic" @click="lookUserDetail(comment.nickname)">
                           <img width="50" height="50" class="picImg" :src="comment.avatar">
                           </aside>
                         <div class="of">
                           <span class="fl">
-                          <font class="fsize12 c-blue">
-                            {{comment.nickname}}</font>
+                          <a class="fsize12 c-blue" @click="lookUserDetail(comment.nickname)">
+                            {{comment.nickname}}</a>
                           <font class="fsize12 c-999 ml5">评论：</font>
                           </span>
                         </div>
@@ -244,19 +244,36 @@
                         </div>
                         <div class="of mt5">
                           <div style="text-align: right;">
-                            <input type="button" @click="deleteComment(comment.id)" value="删除" class="lh-reply-btn">
+                            <input v-if="memberId === comment.memberId" type="button" @click="deleteComment(comment.id)" value="删除" class="lh-reply-btn">
                           </div>
                         </div>
 
                         <div class="of mt5">
                           <span class="fr"><font class="fsize12 c-999 ml5">{{comment.createTime}}</font></span>
                         </div>
-
                       </li>
-
                     </ul>
                 </section>
               </section>
+
+
+        <el-dialog  title="用户信息" :visible.sync="dialogFormVisible">
+
+          <div style="margin-top: 20px;margin-left: 20px;float: left">
+              <img width="120" height="120" class="picImg" :src="userInfo.avatar" >
+          </div>
+            <div style="margin-top: 30px; height: 180px;margin-left: 200px" >
+              <ul>
+                <li><span>昵称：</span>{{userInfo.nickname}}</li>
+                <li><span>年龄：</span>{{userInfo.age}}</li>
+                <li><span>性别：</span>{{userInfo.sex === 1? '男':'女'}}</li>
+                <li><span>个签：</span>{{userInfo.sign}}</li>
+              </ul>
+            </div>
+        </el-dialog>
+
+
+
 
               <!-- 公共分页 开始 -->
               <div class="paging">
@@ -300,6 +317,7 @@
 </template>
 
 <script>
+  import userApi from '@/api/login'
   //引入调用course.js文件
   import courseApi from '@/api/course'
   //引入调用collect.js文件
@@ -344,6 +362,10 @@
           nickname:'',
           avatar:'',
           },
+        memberId: '',
+        //查看用户详情
+        userInfo: {},
+       dialogFormVisible: false
       }
     },
 
@@ -359,6 +381,8 @@
         collectApi.isCollect(this.courseWebVo.id).then(response => {
           this.isCollect = response.data.data
         })
+        console.log(JSON.parse(cookie.get('cloudstudy_ucenter')))
+        this.memberId = JSON.parse(cookie.get('cloudstudy_ucenter')).id;
       }
 
       this.initComment()
@@ -427,6 +451,15 @@
             path: '/login'
           })
         }
+      },
+
+      lookUserDetail(nickname){
+          userApi.getInfoByName(nickname).then(response =>{
+            if(response.data.code === 200){
+                this.userInfo = response.data.data
+                this.dialogFormVisible = true
+            }
+          })
       },
 
       init2(){
@@ -516,11 +549,13 @@
          }).then(() => {
            return commentApi.deleteComment(commentId)
          }).then((response) => {
-           this.initComment()
-           this.$message({
-             type: 'success',
-             message: '删除成功✌',
-           })
+           if(response.data.code === 200) {
+             this.initComment()
+             this.$message({
+               type: 'success',
+               message: '删除成功✌',
+             })
+           }
          }).catch(error => {
            if (error === 'cancel') {
              this.$message({

@@ -12,9 +12,9 @@ export default {
   },
 
   //根据id获取用户信息
-  getMemberInfo(id) {
+  getInfoByName(nickname) {
     return request({
-      url: `/eduucenter/ucenter-member/getUserInfoOrder/${id}`,
+      url: `/user/user/getInfoByName/${nickname}`,
       method: 'post'
     })
   },

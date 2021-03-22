@@ -49,7 +49,7 @@
                       </div>
                     </section>
                     <h3 class="hLh30 txtOf mt10">
-                      <a href="#" :title="course.title" class="course-title fsize18 c-333">{{course.title}}</a>
+                      <a :href="'/course/'+course.id" :title="course.title" class="course-title fsize18 c-333">{{course.title}}</a>
                     </h3>
                     <section class="mt10 hLh20 of">
                       <span class="fr jgTag bg-green" v-if="Number(course.price) === 0">

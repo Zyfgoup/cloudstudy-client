@@ -50,7 +50,7 @@
             </el-table-column>
             <el-table-column label="收藏时间" align="center">
               <template slot-scope="scope">
-                {{ scope.row.gmtCreate }}
+                {{ scope.row.createTime }}
               </template>
             </el-table-column>
 
